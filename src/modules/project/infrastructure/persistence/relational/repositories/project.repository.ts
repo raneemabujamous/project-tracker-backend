@@ -2,17 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, Repository } from 'typeorm';
 import { NullableType } from '../../../../../../utils/types/nullable.type';
-import { Project, User } from '../../../../../../packages/domins';
+import { Project, User , ProjectUser } from '../../../../../../packages/domins';
 import { ProjectRepository } from '../../project.repository';
-import { ProjectMapper} from '../mappers/project.mapper';
+import { ProjectMapper, ProjectUserMapper} from '../mappers/project.mapper';
 import { EntityCondition } from '../../../../../../utils/types/entity-condition.type';
 import{ProjectEntity} from '../entities/project.entity'
+import { ProjectUserEntity } from '../entities/project.user.entity';
 @Injectable()
 export class ProjectsRelationalRepository implements ProjectRepository {
   constructor(
     @InjectRepository(ProjectEntity)
-    private readonly projectRepository: Repository<ProjectEntity>
+    private readonly projectRepository: Repository<ProjectEntity>,
 
+    @InjectRepository(ProjectUserEntity)
+    private readonly projectUserRepo: Repository<ProjectUserEntity>,
 
   ) {}
 
@@ -27,12 +30,39 @@ export class ProjectsRelationalRepository implements ProjectRepository {
   
   }
 
+  async createUserProject(data: ProjectUser): Promise<ProjectUser> {
 
-  async getProjectById(projectId: number): Promise<Project> {
-    const entity = await this.projectRepository.findOneBy({ project_id: projectId });
-    if (!entity) throw new Error('Project not found');
-    return ProjectMapper.toDomain(entity);
+    const existing = await this.projectUserRepo.findOne({
+      where: {
+        user: { user_id: data.user_id },
+        project: { project_id: data.project_id },
+      },
+    });
+    if (existing) {
+      return ProjectUserMapper.toDomain(existing);
+    }
+
+    const persistenceModel = ProjectUserMapper.toPersistence(data); // ProjectEntity
+    const newEntity = await this.projectUserRepo.save(
+      this.projectUserRepo.create(persistenceModel)
+    );
+    return ProjectUserMapper.toDomain(newEntity); // returns Project
+  
   }
+
+  async getProjectById(projectId: number): Promise<any> {
+    return this.projectRepository.findOne({
+      where: { project_id:  projectId },    // nested filter via relation
+      relations: ['project_users' , 'project_users.user']  ,                // include owner
+    });
+  }
+
+  
+  async getProjectUser(projectId: number): Promise<ProjectUser> {
+    const entity = await this.projectUserRepo.findOneBy({ project_id: projectId });
+    if (!entity) throw new Error('Project not found');
+    return entity
+  } 
 
 
   async update(
@@ -58,6 +88,7 @@ export class ProjectsRelationalRepository implements ProjectRepository {
     );
 
     return ProjectMapper.toDomain(updatedEntity);
+
   }
   async delete(project_id: Project['project_id']): Promise<void> {
     await this.projectRepository
@@ -72,10 +103,32 @@ export class ProjectsRelationalRepository implements ProjectRepository {
   async getAllProj(organization_id:number): Promise<Project[]> {
     return this.projectRepository.find({
       where: { organization: { organization_id: organization_id } },    // nested filter via relation
-      relations: ['user']  ,                // include owner
+      relations: ['project_users' ,'project_users.user' ]  ,                // include owner
     });
   }
 
 
+  async getInsigit(organization_id: number): Promise<any> {
+    const projects = await this.projectRepository.find({
+      where: { organization: { organization_id } }, // nested filter via relation
+      relations: ['project_users', 'project_users.user'], // include users
+    });
+  
+    const active_projects = projects.filter(p => p.status === 'active');
+    const completed_projects = projects.filter(p => p.status === 'completed');
+  
+    return {
+      total_project: projects.length,
+      active_project: active_projects,        // use .length if you want counts instead
+      completed_project: completed_projects,  // use .length if you want counts instead
+      project_per_user: {
+        x_label: 'project_name',
+        y_label: 'number_of_users',
+        labels: projects.map(p => p.project_title),
+        values: projects.map(p => p.project_users?.length ?? 0),
+      },
+    };
+  
+}
 
 }

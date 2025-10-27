@@ -16,6 +16,7 @@ import { Project } from '../../../../../../packages/domins';
 import { EntityRelationalHelper } from '../../../../../../utils/relational-entity-helper'
 import { OrganizationEntity } from '@/modules/organization/infrastructure/persistence/relational/entities/organization.entity';
 import { UserEntity } from '@/modules/user/infrastructure/persistence/relational/entities/user.entity';
+import { ProjectUserEntity } from './project.user.entity';
 
 export enum ProjectStatus {
   ACTIVE = "active",
@@ -28,9 +29,6 @@ export enum ProjectStatus {
 export class ProjectEntity extends EntityRelationalHelper implements Project {
   @PrimaryGeneratedColumn()
   project_id: number;
-
-  @Column()
-  user_id: number;
 
   @Column()
   organization_id: number;
@@ -48,22 +46,7 @@ export class ProjectEntity extends EntityRelationalHelper implements Project {
 
   @DeleteDateColumn()
   deletedAt: Date;
-
-  @ManyToOne(
-    () => UserEntity,
-    (user) => user.user_id,
-    {
-      cascade: true,
-      onDelete: 'CASCADE',
-    }
-  )
-  @JoinColumn({
-    name: 'user_id',
-    referencedColumnName: 'user_id',
-  })
-  user: UserEntity;
-
-  
+ 
   @ManyToOne(
     () => OrganizationEntity,
     (user) => user.organization_id,
@@ -77,5 +60,11 @@ export class ProjectEntity extends EntityRelationalHelper implements Project {
     referencedColumnName: 'organization_id',
   })
   organization: OrganizationEntity;
+
+
+  @OneToMany(() => ProjectUserEntity, (project_user) => project_user.project, {
+    onDelete: 'CASCADE',
+  })
+  project_users: ProjectUserEntity[];
 
 }

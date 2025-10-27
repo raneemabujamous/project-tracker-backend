@@ -16,8 +16,8 @@ import { ApiBearerAuth, ApiTags, ApiParam } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthUser } from '../user/user.decorator';
 import { JwtPayloadType } from '../auth/strategies/types/jwt-payload.type';
-import { Project } from '@/packages/domins';
-import {CreateProjectDto,UpdateProjectDto} from '@/packages/dto/project'
+import { Project, ProjectUser } from '@/packages/domins';
+import {CreateProjectDto,UpdateProjectDto,CreateUserProjectDto} from '@/packages/dto/project'
 @ApiTags('Projects')
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
@@ -36,26 +36,28 @@ export class ProjectsController {
     @Body() createProjectDto: CreateProjectDto,
     
   ): Promise<Project> {
-    return this.projectService.create(createProjectDto,jwtPayload.user_id);
+    return this.projectService.create(createProjectDto);
   }
 
-  
-  @Patch(':project_id') // to approve livebaord update liveboard rple
+  @Post('add-user')
+  @HttpCode(HttpStatus.CREATED)
+  createProjectUser(
+    @AuthUser() jwtPayload: JwtPayloadType,
+    @Body() createUserProjectDto: CreateUserProjectDto,
+    
+  ): Promise<ProjectUser> {
+    return this.projectService.createUserProject(createUserProjectDto);
+  }
+
+  @Patch()
   @HttpCode(HttpStatus.OK)
-  @ApiParam({
-    name: 'project_id',
-    type: String,
-    required: true,
-  })
   update(
-    @Param('project_id')
-    project_id: UpdateProjectDto['project_id'],
     @Body() updateProjectDto: any,
     @AuthUser() jwtPayload: JwtPayloadType
   ): Promise<Project | null> {
     return this.projectService.updateProject(
       jwtPayload.user_id,
-      {...updateProjectDto, project_id:project_id}
+     updateProjectDto
     );
   }
 
@@ -75,6 +77,8 @@ export class ProjectsController {
     return this.projectService.delete(project_id,jwtPayload.user_id,);
   }
 
+
+
   @Get(':organization_id')
   @ApiParam({
     name: 'organization_id',
@@ -90,4 +94,19 @@ export class ProjectsController {
     return data;
   }
 
+
+  @Get('insight/:organization_id')
+  @ApiParam({
+    name: 'organization_id',
+    type: Number,
+    required: true,
+  })
+  @HttpCode(HttpStatus.OK)
+  async getInsigit(
+    @Param('organization_id') organization_id: Project['organization_id'],
+
+  ): Promise<Project[]> {
+    let data = await this.projectService.getInsigit(organization_id);
+    return data;
+  }
 }

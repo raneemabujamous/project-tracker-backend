@@ -7,9 +7,18 @@ export class Project {
   project_id: number;
   project_title: string 
   status:ProjectStatus 
-user_id:number 
 organization_id:number
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date;
 }
+
+export class ProjectUser {
+  project_id: number;
+user_id:number 
+project_user_id:number
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date;
+}
+

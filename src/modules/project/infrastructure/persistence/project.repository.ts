@@ -1,7 +1,7 @@
 import { DeepPartial } from '../../../../utils/types/deep-partial.type';
 import { EntityCondition } from '../../../../utils/types/entity-condition.type';
 import { NullableType } from '../../../../utils/types/nullable.type';
-import { Project } from '../../../../packages/domins';
+import { Project, ProjectUser } from '../../../../packages/domins';
 
 export abstract class ProjectRepository {
 
@@ -9,10 +9,20 @@ export abstract class ProjectRepository {
     data: Omit<Project, 'project_id' | 'createdAt' | 'deletedAt' | 'updatedAt'>
   ): Promise<Project>;
 
+
+
+  abstract createUserProject(
+    data: Omit<ProjectUser, 'project_user_id' | 'createdAt' | 'deletedAt' | 'updatedAt'>
+  ): Promise<ProjectUser>;
+
+  
   abstract getProjectById(
     projectId: number 
   ): Promise<Project>;
 
+  abstract getProjectUser(
+    projectId: number 
+  ): Promise<ProjectUser>;
 
 
   abstract update(
@@ -32,6 +42,9 @@ export abstract class ProjectRepository {
     organization_id?: Project['organization_id']
   ): Promise<Project[]>;
 
+  abstract getInsigit(
+    organization_id?: Project['organization_id']
+  ): Promise<any>;
 
   
 }

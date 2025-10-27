@@ -18,6 +18,7 @@ import { EntityRelationalHelper } from '../../../../../../utils/relational-entit
 import { Exclude, Expose } from 'class-transformer';
 import { OrganizationEntity } from '@/modules/organization/infrastructure/persistence/relational/entities/organization.entity';
 import { ProjectEntity } from '@/modules/project/infrastructure/persistence/relational/entities/project.entity';
+import { ProjectUserEntity } from '@/modules/project/infrastructure/persistence/relational/entities/project.user.entity';
 @Entity({
   name: 'users',
 })
@@ -60,10 +61,10 @@ export class UserEntity extends EntityRelationalHelper implements User {
   deletedAt: Date;
 
   
-  @OneToMany(() => ProjectEntity, (project) => project.user, {
+  @OneToMany(() => ProjectUserEntity, (project) => project.user, {
     onDelete: 'CASCADE',
   })
-  projects: ProjectEntity[];
+  projects_user: ProjectUserEntity[];
   
 
   @ManyToOne(
