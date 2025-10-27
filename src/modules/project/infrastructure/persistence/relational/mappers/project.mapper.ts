@@ -20,7 +20,6 @@ export class ProjectMapper {
     const entity = new ProjectEntity();
     entity.project_id = project.project_id;
     entity.organization_id = project.organization_id;
-
     entity.project_title = project.project_title;
     entity.status = project.status;
     entity.createdAt = project.createdAt;
