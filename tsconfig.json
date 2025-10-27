@@ -20,11 +20,14 @@
     "baseUrl": ".",
     "jsx": "react-jsx",
 
-    "paths": {
-      "@/*": ["src/*"],
-      "@/packages/*": ["src/packages/*"],
-      "@/utils/*": ["src/utils/*"]
-          
+    "paths": {    
+        "@/*": ["src/*", "dist/*"],
+
+      // "@/*": ["src/*"],
+      // "@/packages/*": ["src/packages/*"],
+      "@/utils/*": ["src/utils/*"],
+      "@packages/*": ["src/packages/*", "dist/packages/*"]
+
     }
   },
   "exclude": ["node_modules", "tmp"]

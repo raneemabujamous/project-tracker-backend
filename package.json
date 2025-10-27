@@ -27,7 +27,7 @@
   "scripts": {
     "start": "ts-node src/main.ts",
     "start:dev": "NODE_OPTIONS='--experimental-global-webcrypto' ts-node-dev -r tsconfig-paths/register --respawn src/main.ts",
-    "build": "tsc",
+    "build": "tsc -p tsconfig.json",
     "start:prod": "node dist/main.js"
   },
   "devDependencies": {
