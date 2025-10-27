@@ -1,18 +1,34 @@
-# 1) Install dependencies
-npm install
+## Notes
 
-# 2) Configure environment
-cp .env.example .env   # then edit .env
+- The **database is live**.
+- The **frontend and backend are not deployed** yet—run them locally.
 
-# 3) Run the API (dev)
+---
+## install dep 
+npm i 
+## Backend
+
+# Start the API server:
+
 npm run start:dev
-# Server
-PORT=3000
-NODE_ENV=development
 
-# Auth (use your own strong secret)
-JWT_SECRET=replace_me_with_a_long_random_value
-JWT_EXPIRES_IN=7d
+
+# Runs on: http://localhost:8080
+
+# Swagger docs: http://localhost:8080/docs
+
+# Repo: https://github.com/raneemabujamous/project-tracker-backend
+
+## Frontend
+
+# Start the web app:
+
+ npm run dev
+
+
+# Repo: https://github.com/raneemabujamous/project-tracker-frontend
+
+
 
 # Database (PostgreSQL / Neon)
 DB_TYPE=postgres
@@ -27,7 +43,7 @@ DB_SSL=true
 npm run start:dev     # start with watch mode
 
 
-API & Features
+## API & Features
 1) Authentication
 
 JWT-based (or Supabase Auth if you wire it up)
@@ -58,6 +74,6 @@ Totals per organization / per user
 
 Active vs. completed counts
 
-(Optional) Average completion time
+ Average completion time
 
 Endpoints exposed in Swagger under an Analytics tag
